@@ -9,7 +9,7 @@ from icofocas.protocol.packet import ControlDevice, FOCASError, FOCASPacket, FOC
     PacketOrigin, \
     RESPONSE_BUFFER_SIZE, \
     decapsulate_packet, \
-    decode8, encapsulate_packet
+    decode_scaled_integer, encapsulate_packet
 
 logger = logging.getLogger(__name__)
 
@@ -109,7 +109,7 @@ class FOCAS:
 
         macros: dict[int, float] = {}
         for pos in range(0, response.payload_length, 8):
-            macros[first] = decode8(response.data[pos:pos+8])
+            macros[first] = decode_scaled_integer(response.data[pos:pos + 8])
             first += 1
 
         return macros

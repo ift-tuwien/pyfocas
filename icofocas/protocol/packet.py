@@ -48,66 +48,66 @@ SYNC_PREFIX = b'\xa0\xa0\xa0\xa0'           # Sync for request & response
 RESPONSE_BUFFER_SIZE = 1500
 
 
-def decode8(val: bytes) -> float | None:
+def decode_scaled_integer(byte_string: bytes) -> float | None:
     """
     Decode 8 byte scaled integer to float
 
     The decoding treats the value's bytes as a scaled integer, meaning:
 
-    Bytes 0-3: big endian signed integer
-    Byte 4: 00 --> unused
-    Byte 5: The scaling base (2 or 10)
-    Byte 6: 00 (OK) or FF (Sentinel --> invalid)
-    Byte 7: Exponent or FF (Sentinel --> invalid)
+    Bytes 0-3:  big endian signed integer
+    Byte 4:     0x00 (unused)
+    Byte 5:     0x02 or 0x0A (base 2 or 10)
+    Byte 6:     0x00 (OK) or 0xFF (invalid)
+    Byte 7:     Exponent or 0xFF (invalid)
 
-    :param val: Byte string of 8 bytes.
+    :param byte_string: Byte string of 8 bytes.
     :return: Float if decoded, None if not decoded.
 
     Examples:
         Valid:
-        >>> decode8(b'\\x0b\\xc7q \\x00\\n\\x00\\x06')
+        >>> decode_scaled_integer(b'\\x0b\\xc7q \\x00\\n\\x00\\x06')
         197.62
 
         Invalid: length not equal to 8 (too short)
-        >>> decode8(b'\\x00'*7)
+        >>> decode_scaled_integer(b'\\x00'*7)
         Traceback (most recent call last):
         ...
         packet.DecodingError: Length not equal to 8
 
         Invalid: length not equal to 8 (too long)
-        >>> decode8(b'\\x00'*9)
+        >>> decode_scaled_integer(b'\\x00'*9)
         Traceback (most recent call last):
         ...
         packet.DecodingError: Length not equal to 8
 
         Invalid: sentinel 0xFFFF at the end (bytes 6–7)
-        >>> decode8(b'\\x00\\x00\\x00\\x01\\x00\\n\\xff\\xff')
+        >>> decode_scaled_integer(b'\\x00\\x00\\x00\\x01\\x00\\n\\xff\\xff')
         Traceback (most recent call last):
         ...
         packet.DecodingError: Sentinel value (FF FF) at the end
 
         Invalid: scaling base not 2 or 10 (here: 3)
-        >>> decode8(b'\\x00\\x00\\x00\\x01\\x00\\x03\\x00\\x01')
+        >>> decode_scaled_integer(b'\\x00\\x00\\x00\\x01\\x00\\x03\\x00\\x01')
         Traceback (most recent call last):
         ...
         packet.DecodingError: Invalid scaling base
     """
 
     # Only take 8 bytes
-    if len(val) != 8:
+    if len(byte_string) != 8:
         raise DecodingError("Length not equal to 8")
 
     # Check for sentinel value (FF FF) at the end --> invalid
-    if val[-2:] == b'\xff'*2:
+    if byte_string[-2:] == b'\xff'*2:
         raise DecodingError("Sentinel value (FF FF) at the end")
 
     # Check for valid scaling base (2 or 10)
-    if val[5] not in [2,10]:
+    if byte_string[5] not in [2, 10]:
         raise DecodingError("Invalid scaling base")
 
-    mantissa = unpack(">i", val[0:4])[0]
-    base = val[5]
-    exponent = val[7]
+    mantissa = unpack(">i", byte_string[0:4])[0]
+    base = byte_string[5]
+    exponent = byte_string[7]
 
     return mantissa / (base ** exponent)
 
