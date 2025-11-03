@@ -2,14 +2,13 @@
 import logging
 import socket
 import struct
-from typing import Any, Optional
+from typing import Optional
 
 from icofocas.protocol.functions import FOCASFunction
-from icofocas.protocol.packet import ControlDevice, FOCASError, FOCASPacket, FOCASStatInfo, FOCASSysInfo, PacketType, \
-    PacketOrigin, \
-    RESPONSE_BUFFER_SIZE, \
-    extract_focas_packet, \
-    decode_scaled_integer, create_packet
+from icofocas.protocol.packet import ControlDevice, FOCASError, FOCASPacket, \
+    FOCASStatInfo, FOCASSysInfo, PacketType, PacketOrigin, \
+    RESPONSE_BUFFER_SIZE, extract_focas_packet, decode_scaled_integer, \
+    create_packet
 
 logger = logging.getLogger(__name__)
 
