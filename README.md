@@ -1,4 +1,4 @@
-# ICOfocas
+# pyfocas
 
 This project is a barebones reimplementation of the FANUC FOCAS protocol for
 communicating with a CNC machine. 
@@ -77,3 +77,120 @@ payload of 20 bytes which can be split into multiple regions.
 | PURPOSE | Length of the subpacket | CNC or PMC     | Command to execute or which was executed. | Data transmittable via subpacket |
 | LENGTH  | 2 bytes                 | 2 bytes        | 4 bytes                                   | 20 bytes                         |
 
+## Implemented Functions
+
+### Initialize Connection
+
+This needs to be done to create the connection with the FOCAS server.
+
+#### Request
+
+| Sync Prefix   | Packet Origin | Packet Type | Packet Length            | Subpacket Count          |
+|---------------|---------------|-------------|--------------------------|--------------------------|
+| `A0 A0 A0 A0` | `00 01`       | `01 01`     | `00 02` (unclear reason) | `00 02` (unclear reason) |
+
+#### Response
+
+| Sync Prefix   | Packet Origin | Packet Type | Packet Length            | Subpacket Count          |
+|---------------|---------------|-------------|--------------------------|--------------------------|
+| `A0 A0 A0 A0` | `00 04`       | `01 02`     | `01 68` (unclear reason) | `00 08` (unclear reason) |
+
+The response contains 360 Bytes of (as of yet) unclear subpacket content.
+
+### Status Info
+
+#### Request
+
+| Sync Prefix   | Packet Origin | Packet Type | Packet Length | Subpacket Count |
+|---------------|---------------|-------------|---------------|-----------------|
+| `A0 A0 A0 A0` | `00 01`       | `21 01`     | `00 1E`       | `00 01`         |
+
+With the single subpacket being:
+
+| Subpacket Length | Control Device | Function      | Payload       |
+|------------------|----------------|---------------|---------------|
+| `00 1C`          | `00 01`        | `00 01 00 19` | 20 times `00` |
+
+#### Response
+
+| Sync Prefix   | Packet Origin | Packet Type | Packet Length | Subpacket Count |
+|---------------|---------------|-------------|---------------|-----------------|
+| `A0 A0 A0 A0` | `00 04`       | `21 02`     | `00 20`       | `00 01`         |
+
+With the single subpacket being:
+
+| Subpacket Length | Control Device | Function      | Payload                    |
+|------------------|----------------|---------------|----------------------------|
+| `00 1E`          | `00 01`        | `00 01 00 19` | See _FOCAS_STATINFO_STRUCT |
+
+### System Info
+
+#### Request
+
+| Sync Prefix   | Packet Origin | Packet Type | Packet Length | Subpacket Count |
+|---------------|---------------|-------------|---------------|-----------------|
+| `A0 A0 A0 A0` | `00 01`       | `21 01`     | `00 1E`       | `00 01`         |
+
+With the single subpacket being:
+
+| Subpacket Length | Control Device | Function      | Payload       |
+|------------------|----------------|---------------|---------------|
+| `00 1C`          | `00 01`        | `00 01 00 18` | 20 times `00` |
+
+#### Response
+
+| Sync Prefix   | Packet Origin | Packet Type | Packet Length | Subpacket Count |
+|---------------|---------------|-------------|---------------|-----------------|
+| `A0 A0 A0 A0` | `00 04`       | `21 02`     | `00 24`       | `00 01`         |
+
+With the single subpacket being:
+
+| Subpacket Length | Control Device | Function      | Payload                   |
+|------------------|----------------|---------------|---------------------------|
+| `00 22`          | `00 01`        | `00 01 00 18` | See _FOCAS_SYSINFO_STRUCT |
+
+### Read Macro
+
+#### Request
+
+| Sync Prefix   | Packet Origin | Packet Type | Packet Length | Subpacket Count |
+|---------------|---------------|-------------|---------------|-----------------|
+| `A0 A0 A0 A0` | `00 01`       | `21 01`     | `00 1E`       | `00 01`         |
+
+With the single subpacket being:
+
+| Subpacket Length | Control Device | Function      | Payload                                |
+|------------------|----------------|---------------|----------------------------------------|
+| `00 1C`          | `00 01`        | `00 01 00 15` | `00 00 01 F6` `00 00 01 F6` + 12x `00` |
+
+This reads macro variable #502 (`01 F6`). 
+
+#### Response
+
+| Sync Prefix   | Packet Origin | Packet Type | Packet Length | Subpacket Count |
+|---------------|---------------|-------------|---------------|-----------------|
+| `A0 A0 A0 A0` | `00 04`       | `21 02`     | `00 1A`       | `00 01`         |
+
+With the single subpacket being:
+
+| Subpacket Length | Control Device | Function      | Payload                                                                                                                                                                 |
+|------------------|----------------|---------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `00 18`          | `00 01`        | `00 01 00 15` | `00 00 00 00` (Fill)  `00 00 00 10` (#Bytes coming after this) `29 7C 1E 00 00 0A 00 06` (First 8-Byte Scaled Int) `05 F5 E1 00 00 0A 00 08` (Second 8-Byte Scaled Int) |
+
+### Write Macro (Double)
+
+Writes a macro variable with a double value (not scaled integer)
+
+#### Request
+
+| Sync Prefix   | Packet Origin | Packet Type | Packet Length | Subpacket Count |
+|---------------|---------------|-------------|---------------|-----------------|
+| `A0 A0 A0 A0` | `00 01`       | `21 01`     | `00 38`       | `00 01`         |
+
+With the single subpacket being:
+
+| Subpacket Length | Control Device | Function      | Payload                                                                                                                                |
+|------------------|----------------|---------------|----------------------------------------------------------------------------------------------------------------------------------------|
+| `00 24`          | `00 01`        | `00 01 00 A8` | `00 00 01 F6` (Var. 502) `00` (12x Filling Bytes) `00 00 00 08` (#Bytes coming after this) `40 59 00 00 00 00 00 00` (Value as double) |
+
+This writes 100.0 to #502.
