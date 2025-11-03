@@ -9,7 +9,7 @@ from icofocas.protocol.packet import ControlDevice, FOCASError, FOCASPacket, FOC
     PacketOrigin, \
     RESPONSE_BUFFER_SIZE, \
     decapsulate_packet, \
-    decode_scaled_integer, encapsulate_packet
+    decode_scaled_integer, create_packet
 
 logger = logging.getLogger(__name__)
 
@@ -42,10 +42,10 @@ class FOCAS:
         # Reset timeout
         self.socket.settimeout(1)
 
-        focas_open_request = encapsulate_packet(
+        focas_open_request = create_packet(
+            PacketOrigin.CLIENT,
             PacketType.OPEN_REQUEST,
-            struct.pack(">H", PacketOrigin.SERVER),
-            PacketOrigin.CLIENT
+            struct.pack(">H", PacketOrigin.SERVER)
         )
         self.socket.sendall(focas_open_request)
         data = decapsulate_packet(self.socket.recv(RESPONSE_BUFFER_SIZE))
@@ -65,10 +65,10 @@ class FOCAS:
         command = struct.pack(">HHH", control_device, *function)
         if len(payload) != 5:
             raise ValueError("Payload must be a list of 5 integers")
-        self.socket.sendall(encapsulate_packet(
+        self.socket.sendall(create_packet(
+            PacketOrigin.CLIENT,
             PacketType.GENERIC_REQUEST,
-            command + struct.pack(">iiiii", *payload),
-            PacketOrigin.CLIENT
+            command + struct.pack(">iiiii", *payload)
         ))
 
         response = decapsulate_packet(self.socket.recv(RESPONSE_BUFFER_SIZE))
@@ -121,10 +121,10 @@ class FOCAS:
 
         command = struct.pack(">HHH", ControlDevice.CNC, *FOCASFunction.WriteMacroDouble)
 
-        self.socket.sendall(encapsulate_packet(
+        self.socket.sendall(create_packet(
+            PacketOrigin.CLIENT,
             PacketType.GENERIC_REQUEST,
-            command + struct.pack(">iiiiid", macro_number, 0, 0, 0, 8, value),
-            PacketOrigin.CLIENT
+            command + struct.pack(">iiiiid", macro_number, 0, 0, 0, 8, value)
         ))
 
         return decapsulate_packet(self.socket.recv(RESPONSE_BUFFER_SIZE))

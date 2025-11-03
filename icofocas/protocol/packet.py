@@ -112,24 +112,24 @@ def decode_scaled_integer(byte_string: bytes) -> float | None:
     return mantissa / (base ** exponent)
 
 
-def encapsulate_packet(packet_type: PacketType, payload: bytes, origin: PacketOrigin) -> bytes:
+def create_packet(origin: PacketOrigin, packet_type: PacketType, payload: bytes) -> bytes:
     """
     Create a packet with a payload and origin.
 
+    :param origin: The origin of the packet (e.g., CLIENT).
     :param packet_type: The packet type (e.g., GENERIC_REQUEST).
     :param payload: The payload of the packet as bytes
-    :param origin: The origin of the packet (e.g., CLIENT).
 
     :return: The packet as bytes assembled with the sync prefix.
 
     Examples:
-        >>> list(encapsulate_packet(PacketType.GENERIC_REQUEST, b'\x01', PacketOrigin.CLIENT))
+        >>> list(create_packet(PacketOrigin.CLIENT, PacketType.GENERIC_REQUEST, b'\x01'))
         [160, 160, 160, 160, 0, 1, 33, 1, 0, 5, 0, 1, 0, 3, 1]
 
-        >>> list(encapsulate_packet(PacketType.OPEN_REQUEST, b'\x02', PacketOrigin.CLIENT))
+        >>> list(create_packet(PacketOrigin.CLIENT, PacketType.OPEN_REQUEST, b'\x02'))
         [160, 160, 160, 160, 0, 1, 1, 1, 0, 1, 2]
 
-        >>> list(encapsulate_packet(PacketType.CLOSE_REQUEST, b'', PacketOrigin.CLIENT))
+        >>> list(create_packet(PacketOrigin.CLIENT, PacketType.CLOSE_REQUEST, b''))
         [160, 160, 160, 160, 0, 1, 2, 1, 0, 0]
 
     """
