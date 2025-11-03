@@ -1,4 +1,4 @@
-from icofocas.protocol.protocol import FOCAS
+from pyfocas.protocol.protocol import FOCAS
 
 
 def main():
