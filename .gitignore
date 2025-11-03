@@ -1,0 +1,12 @@
+__pycache__
+build
+builds
+venv
+.venv
+data
+config/.env
+dist
+*.spec
+*.exe
+/poetry.lock
+/.idea/
