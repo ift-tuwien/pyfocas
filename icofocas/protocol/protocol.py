@@ -8,7 +8,7 @@ from icofocas.protocol.functions import FOCASFunction
 from icofocas.protocol.packet import ControlDevice, FOCASError, FOCASPacket, FOCASStatInfo, FOCASSysInfo, PacketType, \
     PacketOrigin, \
     RESPONSE_BUFFER_SIZE, \
-    decapsulate_packet, \
+    extract_focas_packet, \
     decode_scaled_integer, create_packet
 
 logger = logging.getLogger(__name__)
@@ -48,7 +48,7 @@ class FOCAS:
             struct.pack(">H", PacketOrigin.SERVER)
         )
         self.socket.sendall(focas_open_request)
-        data = decapsulate_packet(self.socket.recv(RESPONSE_BUFFER_SIZE))
+        data = extract_focas_packet(self.socket.recv(RESPONSE_BUFFER_SIZE))
 
         if data.packet_type == PacketType.OPEN_RESPONSE:
             self.connected = True
@@ -71,7 +71,7 @@ class FOCAS:
             command + struct.pack(">iiiii", *payload)
         ))
 
-        response = decapsulate_packet(self.socket.recv(RESPONSE_BUFFER_SIZE))
+        response = extract_focas_packet(self.socket.recv(RESPONSE_BUFFER_SIZE))
 
         if response.payload_length == 0:
             raise FOCASError("Payload is of length 0")
@@ -127,7 +127,7 @@ class FOCAS:
             command + struct.pack(">iiiiid", macro_number, 0, 0, 0, 8, value)
         ))
 
-        return decapsulate_packet(self.socket.recv(RESPONSE_BUFFER_SIZE))
+        return extract_focas_packet(self.socket.recv(RESPONSE_BUFFER_SIZE))
 
 
     def get_sys_info(self):

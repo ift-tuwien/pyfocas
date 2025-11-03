@@ -1,11 +1,8 @@
-import dataclasses
+from dataclasses import dataclass
 import doctest
 import struct
 from enum import Enum
 from struct import pack, unpack
-from typing import Any
-
-from icofocas.protocol.functions import FOCASFunction
 
 
 class DecodingError(Exception):
@@ -154,7 +151,7 @@ def create_packet(origin: PacketOrigin, packet_type: PacketType, payload: bytes)
 # char  series[4];          // 4
 # char  version[4];         // 4
 # char  axes[2];            // 2
-# --------------------------- = 18 bytes
+# ------------------------- = 18 bytes
 # https://www.inventcom.net/fanuc-focas-library/misc/cnc_sysinfo
 _FOCAS_SYSINFO_STRUCT = struct.Struct(">hh2s2s4s4s2s")
 
@@ -165,7 +162,7 @@ _FOCAS_SYSINFO_STRUCT = struct.Struct(">hh2s2s4s4s2s")
 # short emergency;          // 2
 # short alarm;              // 2
 # short edit;               // 2
-# --------------------------- = 14 bytes
+# ------------------------- = 14 bytes
 # https://www.inventcom.net/fanuc-focas-library/misc/cnc_statinfo
 _FOCAS_STATINFO_STRUCT = struct.Struct(">HHHHHHH")
 
@@ -179,7 +176,7 @@ def _encode_ascii(s: str, length: int) -> bytes:
     return b + b"\x00" * (length - len(b))
 
 
-@dataclasses.dataclass(slots=True)
+@dataclass(slots=True)
 class FOCASSysInfo:
     addinfo: int          # short (signed)
     max_axis: int         # short (signed)
@@ -216,7 +213,7 @@ class FOCASSysInfo:
         )
 
 
-@dataclasses.dataclass
+@dataclass
 class FOCASStatInfo:
     aut: int
     run: int
@@ -233,18 +230,18 @@ class FOCASStatInfo:
         return cls(*_FOCAS_STATINFO_STRUCT.unpack_from(data))
 
 
-@dataclasses.dataclass
+@dataclass
 class FOCASPacket:
     payload_length: int
     packet_type: PacketType
     packet_origin: PacketOrigin
     data: bytes | list | None = None
 
-def decapsulate_packet(data: bytes) -> FOCASPacket:
+def extract_focas_packet(data: bytes) -> FOCASPacket:
     """
     Decapsulate a packet from bytes into a FOCASPacket object.
 
-    The frame layout is:
+    The packet layout is:
       [0:4 ] --> 4 Bytes SYNC_PREFIX
       [4:10] --> 2 Bytes each: packet_origin, packet_type, packet_length
       [10: ] --> payload (length = payload_length)
