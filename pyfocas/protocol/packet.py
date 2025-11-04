@@ -7,6 +7,7 @@ from struct import pack, unpack
 
 class DecodingError(Exception):
     """Exception raised for errors in the decoding of a packet"""
+
     def __init__(self, message: str):
         self.message = message
         super().__init__(self.message)
@@ -14,6 +15,7 @@ class DecodingError(Exception):
 
 class FOCASError(Exception):
     """Exception raised for errors in the FOCAS protocol"""
+
     def __init__(self, message: str):
         self.message = message
         super().__init__(self.message)
@@ -21,12 +23,14 @@ class FOCASError(Exception):
 
 class PacketOrigin(int, Enum):
     """Packet origin."""
+
     CLIENT = 0x01
     SERVER = 0x02
 
 
 class PacketType(int, Enum):
     """Packet type."""
+
     GENERIC_REQUEST = 0x2101
     GENERIC_RESPONSE = 0x2102
     OPEN_REQUEST = 0x0101
@@ -37,11 +41,12 @@ class PacketType(int, Enum):
 
 class ControlDevice(int, Enum):
     """Control device."""
+
     CNC = 0x01
     PMC = 0x02
 
 
-SYNC_PREFIX = b'\xa0\xa0\xa0\xa0'           # Sync for request & response
+SYNC_PREFIX = b"\xa0\xa0\xa0\xa0"  # Sync for request & response
 RESPONSE_BUFFER_SIZE = 1500
 
 
@@ -95,7 +100,7 @@ def decode_scaled_integer(byte_string: bytes) -> float | None:
         raise DecodingError("Length not equal to 8")
 
     # Check for sentinel value (FF FF) at the end --> invalid
-    if byte_string[-2:] == b'\xff'*2:
+    if byte_string[-2:] == b"\xff" * 2:
         raise DecodingError("Sentinel value (FF FF) at the end")
 
     # Check for valid scaling base (2 or 10)
@@ -106,10 +111,12 @@ def decode_scaled_integer(byte_string: bytes) -> float | None:
     base = byte_string[5]
     exponent = byte_string[7]
 
-    return mantissa / (base ** exponent)
+    return mantissa / (base**exponent)
 
 
-def create_packet(origin: PacketOrigin, packet_type: PacketType, payload: bytes) -> bytes:
+def create_packet(
+    origin: PacketOrigin, packet_type: PacketType, payload: bytes
+) -> bytes:
     """
     Create a packet with a payload and origin.
 
@@ -135,13 +142,14 @@ def create_packet(origin: PacketOrigin, packet_type: PacketType, payload: bytes)
         if isinstance(payload, list):
             temp = []
             for item in payload:
-                temp.append(pack(">H", len(item)+2) + item)
-            payload = pack(">H", len(temp)) + b''.join(temp)
+                temp.append(pack(">H", len(item) + 2) + item)
+            payload = pack(">H", len(temp)) + b"".join(temp)
         else:
-            payload=pack(">HH",1, len(payload)+2) + payload
+            payload = pack(">HH", 1, len(payload) + 2) + payload
 
-    return SYNC_PREFIX + pack(">HHH", origin, packet_type, len(payload))+payload
-
+    return (
+        SYNC_PREFIX + pack(">HHH", origin, packet_type, len(payload)) + payload
+    )
 
 
 # short addinfo;            // 2
@@ -178,19 +186,23 @@ def _encode_ascii(s: str, length: int) -> bytes:
 
 @dataclass(slots=True)
 class FOCASSysInfo:
-    addinfo: int          # short (signed)
-    max_axis: int         # short (signed)
-    cnc_type: str         # 2 chars ASCII
-    mt_type: str          # 2 chars ASCII
-    series: str           # 4 chars ASCII
-    version: str          # 4 chars ASCII
-    axes: str             # 2 chars ASCII
+    addinfo: int  # short (signed)
+    max_axis: int  # short (signed)
+    cnc_type: str  # 2 chars ASCII
+    mt_type: str  # 2 chars ASCII
+    series: str  # 4 chars ASCII
+    version: str  # 4 chars ASCII
+    axes: str  # 2 chars ASCII
 
     @classmethod
     def from_bytes(cls, data: bytes) -> "FOCASSysInfo":
         if len(data) < _FOCAS_SYSINFO_STRUCT.size:
-            raise ValueError(f"Need {_FOCAS_SYSINFO_STRUCT.size} bytes, got {len(data)}")
-        addinfo, max_axis, cnc, mt, series, version, axes = _FOCAS_SYSINFO_STRUCT.unpack_from(data)
+            raise ValueError(
+                f"Need {_FOCAS_SYSINFO_STRUCT.size} bytes, got {len(data)}"
+            )
+        addinfo, max_axis, cnc, mt, series, version, axes = (
+            _FOCAS_SYSINFO_STRUCT.unpack_from(data)
+        )
         return cls(
             addinfo=addinfo,
             max_axis=max_axis,
@@ -226,7 +238,9 @@ class FOCASStatInfo:
     @classmethod
     def from_bytes(cls, data: bytes) -> "FOCASStatInfo":
         if len(data) < _FOCAS_STATINFO_STRUCT.size:
-            raise ValueError(f"Need {_FOCAS_STATINFO_STRUCT.size} bytes, got {len(data)}")
+            raise ValueError(
+                f"Need {_FOCAS_STATINFO_STRUCT.size} bytes, got {len(data)}"
+            )
         return cls(*_FOCAS_STATINFO_STRUCT.unpack_from(data))
 
 
@@ -236,6 +250,7 @@ class FOCASPacket:
     packet_type: PacketType
     packet_origin: PacketOrigin
     data: bytes | list | None = None
+
 
 def extract_focas_packet(data: bytes) -> FOCASPacket:
     """
@@ -263,7 +278,7 @@ def extract_focas_packet(data: bytes) -> FOCASPacket:
     if not data.startswith(SYNC_PREFIX):
         raise FOCASError("Data Frame does not start with sync bytes")
 
-    packet_origin, packet_type, payload_length = unpack(">HHH",data[4:10])
+    packet_origin, packet_type, payload_length = unpack(">HHH", data[4:10])
     if payload_length + 10 != packet_length:
         raise FOCASError("Data Frame length does not match payload length")
 
@@ -273,18 +288,17 @@ def extract_focas_packet(data: bytes) -> FOCASPacket:
     data = data[10:]
     if packet_type == PacketType.GENERIC_RESPONSE:
         temp_data = []
-        subpacket_count = unpack(">H",data[0:2])[0]
+        subpacket_count = unpack(">H", data[0:2])[0]
         n = 2
         for t in range(subpacket_count):
-            subpacket_length = unpack(">H", data[n:n+2])[0]
-            temp_data.append(data[n+2:n+subpacket_length])
+            subpacket_length = unpack(">H", data[n : n + 2])[0]
+            temp_data.append(data[n + 2 : n + subpacket_length])
             n += subpacket_length
-        return FOCASPacket(payload_length, packet_type, packet_origin, temp_data)
+        return FOCASPacket(
+            payload_length, packet_type, packet_origin, temp_data
+        )
     else:
         return FOCASPacket(payload_length, packet_type, packet_origin, data)
-
-
-
 
 
 if __name__ == "__main__":
