@@ -12,3 +12,7 @@ check:
 setup:
 	uv venv --allow-existing
 	uv sync --all-extras
+
+.PHONY: test
+test:
+	uv run pytest

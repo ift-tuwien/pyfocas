@@ -34,3 +34,8 @@ enable-unstable-feature = ["string_processing"]
 
 [tool.mypy]
 ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+# - Use doctests
+# - Verbose output
+addopts = "--doctest-modules -v"
