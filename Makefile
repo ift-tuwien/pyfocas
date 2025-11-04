@@ -4,6 +4,9 @@ PACKAGE := pyfocas
 
 # -- Rules ---------------------------------------------------------------------
 
+.PHONY: all
+all: test
+
 .PHONY: setup
 setup:
 	uv venv --allow-existing
