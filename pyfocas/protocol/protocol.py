@@ -75,6 +75,7 @@ class FOCAS:
         command = struct.pack(">HHH", control_device, *function)
         if len(payload) != 5:
             raise ValueError("Payload must be a list of 5 integers")
+        assert self.socket is not None
         self.socket.sendall(
             create_packet(
                 PacketOrigin.CLIENT,
@@ -91,6 +92,9 @@ class FOCAS:
         if response.packet_type != PacketType.GENERIC_RESPONSE:
             raise FOCASError("Packet type is not GENERIC_RESPONSE")
 
+        assert response.data is not None
+        assert len(response.data) >= 1
+        assert isinstance(response.data[0], (bytes, bytearray))
         if response.data[0].startswith(command + b"\x00" * 6):
             return FOCASPacket(
                 payload_length=struct.unpack(">H", response.data[0][12:14])[0],
@@ -127,7 +131,9 @@ class FOCAS:
 
         macros: dict[int, float] = {}
         for pos in range(0, response.payload_length, 8):
-            macros[first] = decode_scaled_integer(response.data[pos : pos + 8])
+            number = decode_scaled_integer(response.data[pos : pos + 8])
+            assert number is not None
+            macros[first] = number
             first += 1
 
         return macros
@@ -142,6 +148,7 @@ class FOCAS:
             ">HHH", ControlDevice.CNC, *FOCASFunction.WriteMacroDouble
         )
 
+        assert self.socket is not None
         self.socket.sendall(
             create_packet(
                 PacketOrigin.CLIENT,
