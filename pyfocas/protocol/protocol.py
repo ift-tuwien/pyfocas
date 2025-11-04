@@ -38,7 +38,7 @@ class FOCAS:
             logger.error(f"Failed to create socket: {err}")
             return False
 
-        # Increase timout for connection
+        # Increase timeout for connection
         self.socket.settimeout(5)
 
         # Try connection
