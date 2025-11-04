@@ -1,7 +1,11 @@
+"""Test functionality of library"""
+
 from pyfocas.protocol.protocol import FOCAS
 
 
 def main():
+    """Communicate with machine using FOCAS library"""
+
     focas = FOCAS(hostname="localhost", port=8193)
     print(focas.connect())
     print(focas.get_sys_info())

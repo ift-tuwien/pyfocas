@@ -1,4 +1,5 @@
-# This is heavily inspired by github.com/diohpix/pyfanuc
+"""This is heavily inspired by github.com/diohpix/pyfanuc"""
+
 import logging
 import socket
 import struct
@@ -23,6 +24,7 @@ logger = logging.getLogger(__name__)
 
 
 class FOCAS:
+    """Main FOCAS communication class"""
 
     def __init__(self, hostname: str, port: int):
         self.hostname = hostname
@@ -35,7 +37,7 @@ class FOCAS:
         try:
             self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         except socket.error as err:
-            logger.error(f"Failed to create socket: {err}")
+            logger.error("Failed to create socket: %s", err)
             return False
 
         # Increase timeout for connection
@@ -46,7 +48,7 @@ class FOCAS:
             self.socket.connect((self.hostname, self.port))
         except TimeoutError:
             logger.error(
-                f"Connection to {self.hostname}:{self.port} timed out"
+                "Connection to %s:%s timed out", self.hostname, self.port
             )
             return False
 
@@ -72,6 +74,8 @@ class FOCAS:
         function: FOCASFunction,
         payload: list[int],
     ):
+        """Send request for command"""
+
         command = struct.pack(">HHH", control_device, *function)
         if len(payload) != 5:
             raise ValueError("Payload must be a list of 5 integers")
@@ -103,10 +107,11 @@ class FOCAS:
                 packet_origin=response.packet_origin,
             )
 
-        else:
-            raise FOCASError("Payload does not match command")
+        raise FOCASError("Payload does not match command")
 
     def get_status_info(self):
+        """Get status information"""
+
         response = self.request_single_command(
             ControlDevice.CNC, FOCASFunction.GetStatInfo, [0, 0, 0, 0, 0]
         )
@@ -115,6 +120,8 @@ class FOCAS:
     def read_macro(
         self, first_macro_number: int, last_macro_number: int | None = None
     ) -> dict[int, float]:
+        """Read macro"""
+
         first = first_macro_number
         last = last_macro_number or first_macro_number
 
@@ -141,6 +148,8 @@ class FOCAS:
     def write_macro_double(
         self, macro_number: int, value: float
     ) -> FOCASPacket:
+        """Write macro"""
+
         if macro_number < 1 or macro_number > 1000:
             raise ValueError("Macro number must be between 1 and 1000")
 
@@ -161,6 +170,8 @@ class FOCAS:
         return extract_focas_packet(self.socket.recv(RESPONSE_BUFFER_SIZE))
 
     def get_sys_info(self):
+        """Get system information"""
+
         response = self.request_single_command(
             ControlDevice.CNC, FOCASFunction.GetSysInfo, [0, 0, 0, 0, 0]
         )

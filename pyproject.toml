@@ -25,6 +25,7 @@ pyfocas = "pyfocas.main:main"
 dev = [
   "Flake8-pyproject>=1.2.3",
   "mypy>=1.16.1",
+  "pylint>=3.3.7",
 ]
 
 [tool.black]
@@ -46,6 +47,9 @@ ignore = [
 
 [tool.mypy]
 ignore_missing_imports = true
+
+[tool.pylint]
+ignore-paths = [ "^.venv.*$" ]
 
 [tool.pytest.ini_options]
 # - Use doctests

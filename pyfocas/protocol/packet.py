@@ -1,3 +1,5 @@
+"""Code for working with packet data"""
+
 from dataclasses import dataclass
 import doctest
 import struct
@@ -189,6 +191,8 @@ def _encode_ascii(s: str, length: int) -> bytes:
 
 @dataclass(slots=True)
 class FOCASSysInfo:
+    """System information"""
+
     addinfo: int  # short (signed)
     max_axis: int  # short (signed)
     cnc_type: str  # 2 chars ASCII
@@ -199,6 +203,8 @@ class FOCASSysInfo:
 
     @classmethod
     def from_bytes(cls, data: bytes) -> "FOCASSysInfo":
+        """Convert bytes to FOCAS system information object"""
+
         if len(data) < _FOCAS_SYSINFO_STRUCT.size:
             raise ValueError(
                 f"Need {_FOCAS_SYSINFO_STRUCT.size} bytes, got {len(data)}"
@@ -217,6 +223,8 @@ class FOCASSysInfo:
         )
 
     def to_bytes(self) -> bytes:
+        """Convert FOCAS system information object into bytes"""
+
         return _FOCAS_SYSINFO_STRUCT.pack(
             int(self.addinfo),
             int(self.max_axis),
@@ -230,6 +238,8 @@ class FOCASSysInfo:
 
 @dataclass
 class FOCASStatInfo:
+    """Status information"""
+
     aut: int
     run: int
     motion: int
@@ -240,6 +250,7 @@ class FOCASStatInfo:
 
     @classmethod
     def from_bytes(cls, data: bytes) -> "FOCASStatInfo":
+        """Convert bytes to Focas status information"""
         if len(data) < _FOCAS_STATINFO_STRUCT.size:
             raise ValueError(
                 f"Need {_FOCAS_STATINFO_STRUCT.size} bytes, got {len(data)}"
@@ -249,6 +260,8 @@ class FOCASStatInfo:
 
 @dataclass
 class FOCASPacket:
+    """Focas message data"""
+
     payload_length: int
     packet_type: PacketType
     packet_origin: PacketOrigin
@@ -293,15 +306,15 @@ def extract_focas_packet(data: bytes) -> FOCASPacket:
         temp_data = []
         subpacket_count = unpack(">H", data[0:2])[0]
         n = 2
-        for t in range(subpacket_count):
+        for _ in range(subpacket_count):
             subpacket_length = unpack(">H", data[n : n + 2])[0]
             temp_data.append(data[n + 2 : n + subpacket_length])
             n += subpacket_length
         return FOCASPacket(
             payload_length, packet_type, packet_origin, temp_data
         )
-    else:
-        return FOCASPacket(payload_length, packet_type, packet_origin, data)
+
+    return FOCASPacket(payload_length, packet_type, packet_origin, data)
 
 
 if __name__ == "__main__":

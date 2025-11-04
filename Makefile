@@ -8,6 +8,7 @@ PACKAGE := pyfocas
 check:
 	uv run flake8 .
 	uv run mypy $(PACKAGE)
+	uv run pylint .
 
 .PHONY: setup
 setup:
