@@ -7,9 +7,6 @@ description = """A reimplementation of the FOCAS protocol using UNIX sockets."""
 keywords = [
     "focas",
     "fanuc",
-    "smart-tool",
-    "stu",
-    "sth"
 ]
 
 name = "icofocas"
