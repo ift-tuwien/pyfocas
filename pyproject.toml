@@ -23,6 +23,7 @@ pyfocas = "pyfocas.main:main"
 
 [project.optional-dependencies]
 dev = [
+  "Flake8-pyproject>=1.2.3",
   "mypy>=1.16.1",
 ]
 
@@ -31,6 +32,17 @@ line-length = 79
 preview = true
 unstable = true
 enable-unstable-feature = ["string_processing"]
+
+[tool.flake8]
+exclude = [
+  ".venv",
+]
+ignore = [
+  "E203", # Whitespace before colon
+  "E402", # Module level import not at top of file
+  "W503", # Line break before binary operator
+  "W504", # Line break after binary operator
+]
 
 [tool.mypy]
 ignore_missing_imports = true

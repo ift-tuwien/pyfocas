@@ -127,13 +127,16 @@ def create_packet(
     :return: The packet as bytes assembled with the sync prefix.
 
     Examples:
-        >>> list(create_packet(PacketOrigin.CLIENT, PacketType.GENERIC_REQUEST, b'\x01'))
+        >>> list(create_packet(PacketOrigin.CLIENT,
+        ...                    PacketType.GENERIC_REQUEST, b'\x01'))
         [160, 160, 160, 160, 0, 1, 33, 1, 0, 5, 0, 1, 0, 3, 1]
 
-        >>> list(create_packet(PacketOrigin.CLIENT, PacketType.OPEN_REQUEST, b'\x02'))
+        >>> list(create_packet(PacketOrigin.CLIENT,
+        ...                    PacketType.OPEN_REQUEST, b'\x02'))
         [160, 160, 160, 160, 0, 1, 1, 1, 0, 1, 2]
 
-        >>> list(create_packet(PacketOrigin.CLIENT, PacketType.CLOSE_REQUEST, b''))
+        >>> list(create_packet(PacketOrigin.CLIENT,
+        ...                    PacketType.CLOSE_REQUEST, b''))
         [160, 160, 160, 160, 0, 1, 2, 1, 0, 0]
 
     """

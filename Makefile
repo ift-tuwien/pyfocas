@@ -6,6 +6,7 @@ PACKAGE := pyfocas
 
 .PHONY: check
 check:
+	uv run flake8 .
 	uv run mypy $(PACKAGE)
 
 .PHONY: setup
