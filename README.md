@@ -195,3 +195,43 @@ With the single subpacket being:
 | `00 24`          | `00 01`        | `00 01 00 A8` | `00 00 01 F6` (Var. 502) `00` (12x Filling Bytes) `00 00 00 08` (#Bytes coming after this) `40 59 00 00 00 00 00 00` (Value as double) |
 
 This writes 100.0 to #502.
+
+## Development
+
+### Release
+
+In the steps below we assume that you
+
+- installed [`uv`](https://docs.astral.sh/uv/), and
+- execute commands in the root of the repository.
+
+Please replace `<VERSION>` with the version number of the package that you want to release (e.g. `0.2.0`).
+
+#### PyPI
+
+To release a new version on [PyPI](https://pypi.org/project/icostate/) please use the commands below:
+
+```sh
+uv version <VERSION>
+export pyfocas_version="$(uv version --short)"
+git commit -a -m "Release: Release version $pyfocas_version"
+git tag "$pyfocas_version"
+git push && git push --tags
+```
+
+#### GitHub
+
+Open the [release notes](https://github.com/MyTooliT/pyfocas/doc/release) for the latest version and [create a new release](https://github.com/MyTooliT/pyfocas/releases/new):
+
+1.  Paste the release notes into the main text of the release web page
+2.  Insert the version number into the tag field
+3.  For the release title use “Version <VERSION>”, where `<VERSION>` specifies the version number (e.g. “Version 0.2”)
+4.  Click on “Publish Release”
+
+**Note:** Alternatively you can also use the [`gh`](https://cli.github.com) command:
+
+```sh
+gh release create
+```
+
+to create the release.
