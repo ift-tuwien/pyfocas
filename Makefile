@@ -6,7 +6,7 @@ PACKAGE := pyfocas
 
 .PHONY: check
 check:
-	mypy $(PACKAGE)
+	uv run mypy $(PACKAGE)
 
 .PHONY: setup
 setup:

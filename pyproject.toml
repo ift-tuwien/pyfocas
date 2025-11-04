@@ -21,6 +21,11 @@ version = "0.1"
 [project.scripts]
 pyfocas = "pyfocas.main:main"
 
+[project.optional-dependencies]
+dev = [
+  "mypy>=1.16.1",
+]
+
 [tool.black]
 line-length = 79
 preview = true
