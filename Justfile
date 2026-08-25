@@ -1,23 +1,24 @@
 # -- Variables -----------------------------------------------------------------
 
-PACKAGE := pyfocas
+package := "pyfocas"
 
 # -- Rules ---------------------------------------------------------------------
 
-.PHONY: all
-all: test
-
-.PHONY: setup
+# Setup Python environment
+[group('setup')]
 setup:
 	uv venv --allow-existing
 	uv sync --all-extras
 
-.PHONY: check
-check:
-	uv run flake8 .
-	uv run mypy $(PACKAGE)
+# Check code with various linters
+[group('lint')]
+check: setup
+	uv run mypy "{{package}}"
+	uv run flake8
 	uv run pylint .
 
-.PHONY: test
+# Run tests
+[default]
+[group('test')]
 test: check
 	uv run pytest
