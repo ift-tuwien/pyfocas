@@ -8,7 +8,7 @@ authors = [
   { name = "René Schwaiger", email = "rene.schwaiger@ift.at" },
 ]
 license = "MIT"
-license-files = "LICENSE"
+license-files = ["LICENSE"]
 
 description = """A reimplementation of the FOCAS protocol using UNIX sockets."""
 keywords = ["focas", "fanuc"]
