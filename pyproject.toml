@@ -5,7 +5,10 @@ build-backend = "poetry.core.masonry.api"
 [project]
 authors = [
     {name = "Moritz Breurather", email = "breurather@ift.at"},
+    {name = "René Schwaiger", email = "rene.schwaiger@ift.at"}
 ]
+license="MIT"
+license-files="LICENSE"
 
 description = """A reimplementation of the FOCAS protocol using UNIX sockets."""
 keywords = [
