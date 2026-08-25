@@ -4,17 +4,14 @@ build-backend = "poetry.core.masonry.api"
 
 [project]
 authors = [
-    {name = "Moritz Breurather", email = "breurather@ift.at"},
-    {name = "René Schwaiger", email = "rene.schwaiger@ift.at"}
+  { name = "Moritz Breurather", email = "breurather@ift.at" },
+  { name = "René Schwaiger", email = "rene.schwaiger@ift.at" },
 ]
-license="MIT"
-license-files="LICENSE"
+license = "MIT"
+license-files = "LICENSE"
 
 description = """A reimplementation of the FOCAS protocol using UNIX sockets."""
-keywords = [
-    "focas",
-    "fanuc",
-]
+keywords = ["focas", "fanuc"]
 
 name = "pyfocas"
 readme = "README.md"
@@ -25,14 +22,8 @@ version = "0.1"
 pyfocas = "pyfocas.main:main"
 
 [project.optional-dependencies]
-dev = [
-  "Flake8-pyproject>=1.2.3",
-  "mypy>=1.16.1",
-  "pylint>=3.3.7",
-]
-test = [
-  "pytest>=8.4.2",
-]
+dev = ["Flake8-pyproject>=1.2.3", "mypy>=1.16.1", "pylint>=3.3.7"]
+test = ["pytest>=8.4.2"]
 
 [tool.black]
 line-length = 79
@@ -41,9 +32,7 @@ unstable = true
 enable-unstable-feature = ["string_processing"]
 
 [tool.flake8]
-exclude = [
-  ".venv",
-]
+exclude = [".venv"]
 ignore = [
   "E203", # Whitespace before colon
   "E402", # Module level import not at top of file
@@ -55,7 +44,7 @@ ignore = [
 ignore_missing_imports = true
 
 [tool.pylint]
-ignore-paths = [ "^.venv.*$" ]
+ignore-paths = ["^.venv.*$"]
 
 [tool.pytest.ini_options]
 # - Use doctests
