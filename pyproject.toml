@@ -16,7 +16,7 @@ keywords = ["focas", "fanuc"]
 name = "pyfocas"
 readme = "README.md"
 requires-python = ">=3.10,<4"
-version = "0.1.1b1"
+version = "0.1.1"
 
 [project.scripts]
 pyfocas = "pyfocas.main:main"
