@@ -8,7 +8,9 @@ from enum import Enum
 class FOCASFunction(tuple, Enum):
     """Constants for accessing Focas functionality"""
 
+    # pylint: disable=invalid-name
     GetSysInfo = (0x01, 0x18)
     GetStatInfo = (0x01, 0x19)
     ReadMacro = (0x01, 0x15)
     WriteMacroDouble = (0x01, 0xA8)
+    # pylint: enable=invalid-name
