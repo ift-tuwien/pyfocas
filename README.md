@@ -209,7 +209,7 @@ Please replace `<VERSION>` with the version number of the package that you want 
 
 #### PyPI
 
-To release a new version on [PyPI](https://pypi.org/project/icostate/) please use the commands below:
+To release a new version on [PyPI](https://pypi.org/project/pyfocas/) please use the commands below:
 
 ```sh
 uv version <VERSION>
