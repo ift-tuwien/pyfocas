@@ -98,7 +98,7 @@ class FOCAS:
 
         assert response.data is not None
         assert len(response.data) >= 1
-        assert isinstance(response.data[0], (bytes, bytearray))
+        assert isinstance(response.data[0], bytes)
         if response.data[0].startswith(command + b"\x00" * 6):
             return FOCASPacket(
                 payload_length=struct.unpack(">H", response.data[0][12:14])[0],
