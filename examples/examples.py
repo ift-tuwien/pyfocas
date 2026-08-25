@@ -3,7 +3,7 @@
 from pyfocas.protocol.protocol import FOCAS
 
 
-def main():
+def basic_example():
     """Communicate with machine using FOCAS library"""
 
     focas = FOCAS(hostname="localhost", port=8193)
@@ -20,4 +20,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    basic_example()
