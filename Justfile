@@ -1,8 +1,13 @@
+# -- Settings ------------------------------------------------------------------
+
+# Use latest version of PowerShell on Windows
+set windows-shell := ["pwsh.exe", "-NoLogo", "-Command"]
+
 # -- Variables -----------------------------------------------------------------
 
 package := "pyfocas"
 
-# -- Rules ---------------------------------------------------------------------
+# -- Recipes -------------------------------------------------------------------
 
 # Setup Python environment
 [group('setup')]
@@ -22,3 +27,27 @@ check: setup
 [group('test')]
 test: check
 	uv run pytest
+
+# Release new package version
+[group('release')]
+[unix]
+release version:
+	#!/usr/bin/env sh -e
+	uv version {{version}}
+	version="$(uv version --short)"
+	git commit -a -m "Release: Release version ${version}"
+	git tag "${version}"
+	git push
+	git push --tags
+
+# Release new package version
+[group('release')]
+[windows]
+release version:
+	#!pwsh
+	uv version {{version}}
+	set version "$(uv version --short)"
+	git commit -a -m "Release: Release version ${version}"
+	git tag "${version}"
+	git push
+	git push --tags

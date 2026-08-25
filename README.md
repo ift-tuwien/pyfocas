@@ -202,7 +202,7 @@ This writes 100.0 to #502.
 
 In the steps below we assume that you
 
-- installed [`uv`](https://docs.astral.sh/uv/), and
+- installed [`uv`](https://docs.astral.sh/uv/) and [`just`](https://just.systems), and
 - execute commands in the root of the repository.
 
 Please replace `<VERSION>` with the version number of the package that you want to release (e.g. `0.2.0`).
@@ -212,11 +212,7 @@ Please replace `<VERSION>` with the version number of the package that you want 
 To release a new version on [PyPI](https://pypi.org/project/pyfocas/) please use the commands below:
 
 ```sh
-uv version <VERSION>
-export pyfocas_version="$(uv version --short)"
-git commit -a -m "Release: Release version $pyfocas_version"
-git tag "$pyfocas_version"
-git push && git push --tags
+just release <VERSION>
 ```
 
 #### GitHub
