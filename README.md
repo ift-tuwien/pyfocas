@@ -217,7 +217,7 @@ just release <VERSION>
 
 #### GitHub
 
-Open the [release notes](https://github.com/MyTooliT/pyfocas/doc/release) for the latest version and [create a new release](https://github.com/MyTooliT/pyfocas/releases/new):
+Open the [release notes](https://github.com/ift-tuwien/pyfocas/doc/release) for the latest version and [create a new release](https://github.com/ift-tuwien/pyfocas/releases/new):
 
 1.  Paste the release notes into the main text of the release web page
 2.  Insert the version number into the tag field
